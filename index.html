@@ -3,45 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song Viewer</title>
-    <script>
-        // Check for authentication token
-        function checkAuthentication() {
-            return localStorage.getItem('authToken') !== null;
-        }
-
-        // Function to toggle form visibility
-        function toggleForm() {
-            const form = document.getElementById('addSongForm');
-            if (checkAuthentication()) {
-                form.style.display = 'block';
-            } else {
-                form.style.display = 'none';
-            }
-        }
-
-        // Load songs from songs.json
-        async function loadSongs() {
-            const response = await fetch('songs.json');
-            const songs = await response.json();
-            const songsContainer = document.getElementById('songs');
-            songsContainer.innerHTML = songs.map(song => `<div>${song.title} - ${song.artist}</div>`).join('');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            toggleForm();
-            loadSongs();
-        });
-    </script>
+    <title>Songish</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Public Song Viewer</h1>
-    <div id="songs"></div>
-    <form id="addSongForm" style="display: none;">
-        <input type="text" name="title" placeholder="Song Title" required />
-        <input type="text" name="artist" placeholder="Artist" required />
-        <button type="submit">Add Song</button>
-        <input type="hidden" name="token" value="YOUR_TOKEN_HERE" />
-    </form>
+    <h1>Welcome to Songish</h1>
+    <div id="songs-container">
+        <!-- Songs list will be populated here -->
+    </div>
+    
+    <button id="login-btn">🔐 Login</button>
+
+    <div id="login-modal" style="display:none;">
+        <h2>Login</h2>
+        <input type="password" id="password" placeholder="Enter your password">
+        <button id="submit-password">Submit</button>
+    </div>
+
+    <div id="add-song-form" style="display:none;">
+        <h2>Add a New Song</h2>
+        <form>
+            <input type="text" id="song-title" placeholder="Song Title" required>
+            <button type="submit">Add Song</button>
+        </form>
+    </div>
+
+    <script>
+        const loginBtn = document.getElementById('login-btn');
+        const loginModal = document.getElementById('login-modal');
+        const addSongForm = document.getElementById('add-song-form');
+        let authenticated = false; // Change this as per authentication logic
+
+        loginBtn.onclick = () => {
+            loginModal.style.display = 'block';
+        };
+
+        document.getElementById('submit-password').onclick = () => {
+            const passwordInput = document.getElementById('password').value;
+            // Simulate authentication check
+            if (passwordInput === 'yourPassword') { // Replace 'yourPassword' with actual authentication logic
+                authenticated = true;
+                loginModal.style.display = 'none';
+                addSongForm.style.display = 'block';
+            } else {
+                alert('Incorrect password');
+            }
+        };
+    </script>
 </body>
 </html>
