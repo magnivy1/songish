@@ -6,33 +6,41 @@
     <title>Songish</title>
 </head>
 <body>
-    <h1>Welcome to Songish!</h1>
-    <section id="song-input">
-        <h2>Add a new song and comment:</h2>
-        <input type="text" id="song-name" placeholder="Song Name" required>
-        <input type="text" id="comment" placeholder="Your Comment" required>
-        <button id="add-song">Add Song</button>
-    </section>
-    <section id="song-list">
-        <h2>Today's Songs</h2>
-        <ul id="songs"></ul>
-    </section>
+    <h1>Save Your Song</h1>
+    <input type="text" id="songTitle" placeholder="Enter song title" />
+    <button id="saveSong">Save Song</button>
 
     <script>
-        document.getElementById('add-song').addEventListener('click', function() {
-            const songName = document.getElementById('song-name').value;
-            const comment = document.getElementById('comment').value;
-            const songList = document.getElementById('songs');
+        document.getElementById('saveSong').addEventListener('click', async () => {
+            const title = document.getElementById('songTitle').value;
+            if (title) {
+                // Fetch the current songs from songs.json
+                let response = await fetch('songs.json');
+                let songs = await response.json();
+                songs.push(title);
 
-            if(songName && comment) {
-                const li = document.createElement('li');
-                li.textContent = `${songName} - ${comment}`;
-                songList.appendChild(li);
+                // Save updated songs back to songs.json
+                const blob = new Blob([JSON.stringify(songs, null, 2)], { type: 'application/json' });
+                const formData = new FormData();
+                formData.append('file', blob, 'songs.json');
 
-                document.getElementById('song-name').value = ''; // Clear input
-                document.getElementById('comment').value = ''; // Clear input
+                // Use GitHub API to save the blob
+                await fetch('https://api.github.com/repos/magnivy1/songish/contents/songs.json', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token YOUR_GITHUB_TOKEN',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Update songs.json with a new song',
+                        content: btoa(JSON.stringify(songs, null, 2)),
+                        sha: '706758f9770d19015a5afe0f7d3e02c57b2922b4'
+                    })
+                });
+
+                alert('Song saved!');
             } else {
-                alert("Please fill in both fields.");
+                alert('Please enter a song title.');
             }
         });
     </script>
