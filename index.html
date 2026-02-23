@@ -3,23 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song of the Day</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Daily Vinyl | Song of the Day</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffeb3b;
+            --secondary: #ff5722;
+            --accent: #2196f3;
+            --bg: #f0f0f0;
+            --text: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(#ccc 10%, transparent 11%), radial-gradient(#ccc 10%, transparent 11%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            background: var(--primary);
+            border: 4px solid black;
+            padding: 20px;
+            box-shadow: 10px 10px 0px black;
+            margin-bottom: 40px;
+            transform: rotate(-1deg);
+        }
+
+        h1 { font-family: 'Bangers', cursive; font-size: 4rem; margin: 0; letter-spacing: 2px; }
+
+        .song-card {
+            background: white;
+            border: 4px solid black;
+            padding: 30px;
+            box-shadow: 8px 8px 0px var(--secondary);
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .song-card::before {
+            content: "LATEST HIT!";
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            background: var(--secondary);
+            color: white;
+            padding: 10px;
+            font-family: 'Bangers', cursive;
+            border: 3px solid black;
+            transform: rotate(5deg);
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 15px;
+            border: 3px solid black;
+            font-size: 1.1rem;
+            box-shadow: 4px 4px 0px black;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .history-item {
+            background: white;
+            border: 3px solid black;
+            padding: 15px;
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover { transform: scale(1.02); }
+
+        .date { font-weight: bold; color: var(--accent); text-transform: uppercase; font-size: 0.8rem; }
+        
+        a.btn {
+            display: inline-block;
+            margin-top: 15px;
+            background: black;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-family: 'Bangers', cursive;
+            font-size: 1.2rem;
+        }
+
+        a.btn:hover { background: var(--accent); }
+
+        hr { border: 2px solid black; margin: 40px 0; }
+    </style>
 </head>
 <body>
+
+<div class="container">
     <header>
-        <h1>Song of the Day</h1>
+        <h1>SONG OF THE DAY</h1>
+        <p>A daily rhythm and personal thoughts by Magnivy.</p>
     </header>
-    <main>
-        <section>
-            <h2>Today's Featured Song</h2>
-            <p>Artist: <span id="artist-name"></span></p>
-            <p>Song Title: <span id="song-title"></span></p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2026 Song of the Day</p>
-    </footer>
-    <script src="script.js"></script>
+
+    <div id="latest-container">
+        </div>
+
+    <hr>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by song, artist, or thoughts..." onkeyup="filterSongs()">
+    </div>
+
+    <div id="history-container" class="history-grid">
+        </div>
+</div>
+
+<script>
+    // --- YOUR DATA ---
+    const songs = [
+        {
+            date: "Feb 23, 2026",
+            title: "Hanan Ben Ari - Aluf HaOlam",
+            thoughts: "A powerful anthem about internal struggles. Great for guitar practice too!",
+            link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            date: "Feb 22, 2026",
+            title: "Skoda Beats - Engine Symphony",
+            thoughts: "The 1.5 TSI has a specific rhythm today. Smooth driving music.",
+            link: "#"
+        },
+        {
+            date: "Feb 21, 2026",
+            title: "Classical Guitar Essentials",
+            thoughts: "Working on some fingerpicking patterns. Music is the best escape.",
+            link: "#"
+        }
+    ];
+
+    function displaySongs(data) {
+        const latest = data[0];
+        const history = data.slice(1);
+
+        // Render Latest
+        document.getElementById('latest-container').innerHTML = `
+            <div class="song-card">
+                <div class="date">${latest.date}</div>
+                <h2 style="font-family: 'Bangers'; font-size: 2.5rem; margin: 10px 0;">${latest.title}</h2>
+                <p style="font-style: italic; font-size: 1.2rem; border-left: 4px solid var(--primary); padding-left: 15px;">
+                    "${latest.thoughts}"
+                </p>
+                <a href="${latest.link}" class="btn" target="_blank">PLAY LOUD →</a>
+            </div>
+        `;
+
+        // Render History
+        renderHistory(history);
+    }
+
+    function renderHistory(items) {
+        const container = document.getElementById('history-container');
+        container.innerHTML = items.map(song => `
+            <div class="history-item">
+                <div class="date">${song.date}</div>
+                <h3 style="margin: 5px 0;">${song.title}</h3>
+                <p style="font-size: 0.9rem;">${song.thoughts}</p>
+                <a href="${song.link}" style="color: var(--secondary); font-weight: bold;">Listen →</a>
+            </div>
+        `).join('');
+    }
+
+    function filterSongs() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = songs.slice(1).filter(song => 
+            song.title.toLowerCase().includes(query) || 
+            song.thoughts.toLowerCase().includes(query)
+        );
+        renderHistory(filtered);
+    }
+
+    // Initialize
+    displaySongs(songs);
+</script>
+
 </body>
 </html>
